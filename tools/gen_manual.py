@@ -27,6 +27,9 @@ TOP = {'l': (202.2, 434.6), 'minus': (271.8, 475.9), 'share': (339.6, 518.9),
 FACE = {'north': (800.5, 611.4), 'west': (714.2, 695.9), 'east': (885.6, 695.9), 'south': (800.5, 782.2)}
 DPAD_LABEL = (215.4, 836)
 SCREEN = (391.571, 673.874, 231.426, 122.361)
+# The two small buttons in the top notch: BOOT (BOOTSEL) left, RESET right.
+BOOT = (445.514, 280.52, 40.269, 51.775)
+RESET = (527.5, 280.52, 40.269, 51.775)
 
 SYSTEM = {'minus': 'SERVICE', 'share': 'COIN', 'home': 'TEST'}
 PAGES = [
@@ -50,6 +53,7 @@ PAGES = [
     ('taiko', 'Taiko no Tatsujin', '00', {
         **SYSTEM, 'plus': 'ENTER', 'dpad': 'UP / DOWN: MENU',
         'west': 'KA L', 'north': 'DON L', 'south': 'DON R', 'east': 'KA R'}),
+    ('update', 'Firmware update', None, {}),
 ]
 
 
@@ -75,12 +79,36 @@ def text(x, y, label, size, weight='bold', fill='black'):
             f'fill="{fill}" text-anchor="middle" dominant-baseline="middle">{label}</text>')
 
 
+def small_button(rect, fill, label, step, anchor):
+    x, y, w, h = rect
+    tx = x - 18 if anchor == 'end' else x + w + 18
+    return [f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" fill="{fill}" stroke="black" stroke-width="4.08"/>',
+            f'<text x="{tx:.1f}" y="{y + 14:.1f}" font-family="{FONT}" font-size="26" font-weight="bold" '
+            f'fill="{fill}" text-anchor="{anchor}" dominant-baseline="middle">{label}</text>',
+            f'<text x="{tx:.1f}" y="{y + 42:.1f}" font-family="{FONT}" font-size="17" font-weight="bold" '
+            f'fill="#333" text-anchor="{anchor}" dominant-baseline="middle">{step}</text>']
+
+
+def update_steps():
+    parts = small_button(BOOT, '#d9480f', 'BOOT', '1. HOLD', 'end')
+    parts += small_button(RESET, '#1971c2', 'RESET', '2. PRESS ONCE', 'start')
+    parts.append(text(507, 400, '3. RELEASE BOOT', 20, 'bold', '#d9480f'))
+    parts.append(text(507, 430, 'RPI-RP2 DRIVE APPEARS', 17, 'bold', '#555'))
+    parts.append(text(507, 456, 'COPY THE .UF2 ONTO IT', 17, 'bold', '#555'))
+    return parts
+
+
 def diagram(title, screen, labels, folder):
     parts = ['<svg xmlns="http://www.w3.org/2000/svg" xmlns:serif="http://www.serif.com/" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -10 1024 960" '
              'width="1024" height="960" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">',
              '<rect x="0" y="-10" width="1024" height="960" fill="white"/>',
              text(512, 30, title, 34),
-             controller_body(), screen_image(folder, screen)]
+             controller_body()]
+    if screen is None:
+        parts += update_steps()
+        parts.append('</svg>')
+        return '\n'.join(parts)
+    parts.append(screen_image(folder, screen))
     for key, (x, y) in TOP.items():
         if key in labels:   # Nudged towards the middle, clear of the neighbour button.
             parts.append(text(x + (8 if x < 512 else -8), y - 42, labels[key], 18))
