@@ -1,4 +1,4 @@
-# Onigiri USIO - User manual / Manuale d'uso
+# Onigiri USIO - User manual
 
 ## Quick start
 
@@ -10,44 +10,29 @@
 4. Start the game. The Onigiri remembers the choice; you only select again
    when you change game.
 
-## Avvio rapido
-
-1. Collega il cavo USB dell'Onigiri alla porta USB I/O del Namco System
-   357/369, dove andrebbe la scheda USIO originale.
-2. Tieni premuti **−** e **+** insieme per 2 secondi: si apre il Game Select.
-3. Scegli il gioco con il D-pad (su/giù) e conferma con **+**. Con **−** esci
-   senza cambiare.
-4. Avvia il gioco. L'Onigiri ricorda la scelta: va rifatta solo quando cambi
-   gioco.
-
 ![Game Select](game-select.svg)
 
 ## Display
 
 * **uptime**: time since power on. If the game stops talking to the I/O
   board (crash or freeze), the clock stops and blinks.
-  *Tempo dall'accensione. Se il gioco smette di comunicare (crash o blocco),
-  il contatore si ferma e lampeggia.*
 * **Game title** in the middle. **DX** appears under Deadstorm Pirates when
   the DX cabinet mode is on.
-  *Al centro il gioco selezionato; sotto Deadstorm Pirates compare DX quando
-  la modalità DX è attiva.*
 * **TEST** in the bottom bar while test mode is on.
-  *TEST nella barra in basso mentre il test mode è attivo.*
 
-## System buttons / Tasti di sistema (all games)
+## System buttons (all games)
 
-| Button | Function | Funzione |
-|---|---|---|
-| **Share** | Coin - one credit per press | Gettone - un credito per pressione |
-| **Home** | Test mode on / off | Test mode acceso / spento |
-| **−** | Service | Service |
-| **+** | Start / Enter in menus | Start / Enter nei menu |
-| **− and +** (2 s) | Game Select | Selezione gioco |
-| **L** | Deadstorm Pirates: DX cabinet on / off (remembered) | Deadstorm: modalità DX on / off (memorizzata) |
-| **R** | Button 5 in Tekken Tag 2, Dragon Ball, Gundam | Tasto 5 in Tekken Tag 2, Dragon Ball, Gundam |
+| Button | Function |
+|---|---|
+| **Share** | Coin - one credit per press |
+| **Home** | Test mode on / off |
+| **−** | Service |
+| **+** | Start / Enter in menus |
+| **− and +** (2 s) | Game Select |
+| **L** | Deadstorm Pirates: DX cabinet on / off (remembered) |
+| **R** | Button 5 in Tekken Tag 2, Dragon Ball, Gundam |
 
-## Game controls / Comandi per gioco
+## Game controls
 
 ### Tekken 6 · Tekken 6 BR
 
@@ -110,7 +95,6 @@
 | + | Enter in menus |
 
 Calibrate the gun in the game's test menu if the crosshair is off center.
-*Se il mirino non è centrato, calibra la pistola dal test menu del gioco.*
 
 ### Taiko no Tatsujin
 
