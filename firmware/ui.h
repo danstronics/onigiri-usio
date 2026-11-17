@@ -11,6 +11,7 @@ typedef struct {
     bool frozen;         // The System stopped issuing USIO commands.
     bool blink_on;       // Blink phase for the frozen clock.
     bool test, dx;
+    uint16_t scroll;     // Game Select marquee step, advanced by the caller.
 } ui_state_t;
 // Renders into an SSD1306 page-ordered buffer (x + 128 * (y / 8), bit y % 8).
 void ui_render(const ui_state_t *, uint8_t fb[UI_BYTES]);

@@ -132,8 +132,10 @@ static void main_screen(const ui_state_t *s, uint8_t *fb) {
 static void menu_screen(const ui_state_t *s, uint8_t *fb) {
     bar(fb, 0, "GAME SELECT", "v" ONIGIRI_VERSION);
     fill(fb, 0, 9, UI_WIDTH, UI_HEIGHT - 9, false);
-    enum { ROWS = 5, ROW_H = 9, LIST_TOP = 10, TRACK_H = ROWS * ROW_H, SCROLL_X = UI_WIDTH - 3, LIST_W = UI_WIDTH - 5 };
-    unsigned first = s->selected >= ROWS - 1 ? s->selected - (ROWS - 2) : 0;
+    enum { ROWS = 5, ROW_H = 9, LIST_TOP = 10, TRACK_H = ROWS * ROW_H, SCROLL_X = UI_WIDTH - 3, LIST_W = UI_WIDTH - 5,
+           TEXT_X = 3, TEXT_END = LIST_W - 3, GAP = 24, PAUSE = 25 };
+    unsigned at = usio_menu_position((usio_profile_t)s->selected);
+    unsigned first = at >= ROWS - 1 ? at - (ROWS - 2) : 0;
     if (first + ROWS > USIO_PROFILE_COUNT) first = USIO_PROFILE_COUNT - ROWS;
     // Scroll bar: dotted track, thumb sized to the visible share of the list.
     for (int y = LIST_TOP; y < LIST_TOP + TRACK_H; y += 2) pixel(fb, SCROLL_X + 1, y, true);
@@ -141,14 +143,24 @@ static void menu_screen(const ui_state_t *s, uint8_t *fb) {
     int thumb_y = LIST_TOP + (TRACK_H - thumb) * (int)first / (USIO_PROFILE_COUNT - ROWS);
     fill(fb, SCROLL_X, thumb_y, 3, thumb, true);
     for (unsigned i = 0; i < ROWS; i++) {
-        unsigned p = first + i; int y = LIST_TOP + (int)i * ROW_H;
-        bool sel = p == s->selected;
+        usio_profile_t p = usio_menu_profile(first + i); int y = LIST_TOP + (int)i * ROW_H;
+        bool sel = p == (usio_profile_t)s->selected;
         if (sel) fill(fb, 0, y, LIST_W - 1, ROW_H, true);
-        const char *name = usio_profile_name((usio_profile_t)p);
-        for (int col = 0, x = 3; name[col] && x + 5 < LIST_W - 2; col++, x += 6)
-            for (int c = 0; c < 5; c++) {
-                uint8_t bits = ui_clock_cols[glyph(name[col]) * 5 + c];
-                for (int row = 0; row < 8; row++) if (bits & (1u << row)) pixel(fb, x + c, y + 1 + row, !sel);
+        const char *name = usio_profile_name(p);
+        int width = (int)strlen(name) * 6 - 1, offset = 0, copies = 1;
+        // Titles wider than the row scroll in a loop, pausing at the start.
+        if (width > TEXT_END - TEXT_X) {
+            int period = width + 1 + GAP, phase = s->scroll % (period + PAUSE);
+            offset = phase < PAUSE ? 0 : phase - PAUSE; copies = 2;
+        }
+        for (int copy = 0; copy < copies; copy++)
+            for (int col = 0; name[col]; col++) {
+                int x = TEXT_X - offset + copy * (width + 1 + GAP) + col * 6;
+                for (int c = 0; c < 5; c++) {
+                    if (x + c < TEXT_X || x + c >= TEXT_END) continue;
+                    uint8_t bits = ui_clock_cols[glyph(name[col]) * 5 + c];
+                    for (int row = 0; row < 8; row++) if (bits & (1u << row)) pixel(fb, x + c, y + 1 + row, !sel);
+                }
             }
     }
     tiny(fb, 3, UI_HEIGHT - 5, "+ OK", true);

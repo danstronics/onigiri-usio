@@ -139,16 +139,16 @@ static void selector_tests(void) {
     assert(!usio_selector_update(&s, true, true, false, false, 2010) && s.menu);
     usio_selector_update(&s, false, false, false, false, 2020);
     usio_selector_update(&s, false, false, false, true, 2030);
-    assert(s.selected == USIO_TEKKEN);
+    assert(s.selected == USIO_H050); // Taiko is last in the menu; Down wraps to Tekken 6.
     usio_selector_update(&s, false, false, false, false, 2040);
     assert(usio_selector_update(&s, true, false, false, false, 2050));
-    assert(s.active == USIO_TEKKEN && !s.menu && usio_selector_captures(&s));
+    assert(s.active == USIO_H050 && !s.menu && usio_selector_captures(&s));
     usio_selector_update(&s, false, false, false, false, 2060); assert(!usio_selector_captures(&s));
     // Timer wrap and cancelling without selecting a profile.
     usio_selector_update(&s, true, true, false, false, UINT32_MAX - 999);
     usio_selector_update(&s, true, true, false, false, 1000); assert(s.menu);
     usio_selector_update(&s, false, false, false, false, 1010);
-    usio_selector_update(&s, false, true, false, false, 1020); assert(!s.menu && s.active == USIO_TEKKEN);
+    usio_selector_update(&s, false, true, false, false, 1020); assert(!s.menu && s.active == USIO_H050);
     assert(usio_profile_pid(USIO_H050) == 0x0900 && usio_profile_pid(USIO_TEKKEN) == 0x0910);
     puts("PASS two-button menu hold/release, vertical selection, confirm/cancel, timer wrap and profile IDs.");
 }
@@ -193,7 +193,7 @@ static void game_profile_tests(void) {
     for(unsigned i=1;i<USIO_PROFILE_COUNT;i++) {
         usio_selector_update(&s,false,false,false,true,100+i*2);
         usio_selector_update(&s,false,false,false,false,101+i*2);
-        assert((unsigned)s.selected==i);
+        assert(s.selected==usio_menu_profile(i-1)); // Menu order, not profile numbers.
     }
     usio_selector_update(&s,false,false,false,true,200);assert(s.selected==USIO_TAIKO);
     puts("PASS per-game PID/version, Tekken6/BR legacy P1 masks, all shooter profiles, full selector traversal.");

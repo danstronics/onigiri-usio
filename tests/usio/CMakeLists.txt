@@ -31,4 +31,8 @@ endif()
 add_executable(ui-test ${CMAKE_CURRENT_LIST_DIR}/../ui/ui_preview.c ${FIRMWARE}/ui.c ${FIRMWARE}/usio_profiles.c)
 target_include_directories(ui-test PRIVATE ${FIRMWARE})
 target_compile_options(ui-test PRIVATE -Wall -Wextra -Werror -UNDEBUG)
+# Show the firmware version in rendered screens (used by the manual).
+file(STRINGS ${FIRMWARE}/CMakeLists.txt USIO_PROJECT_LINE REGEX "OnigiriUSIO VERSION")
+string(REGEX MATCH "[0-9]+[.][0-9]+[.][0-9]+" USIO_VERSION "${USIO_PROJECT_LINE}")
+target_compile_definitions(ui-test PRIVATE ONIGIRI_VERSION="${USIO_VERSION}")
 add_test(NAME ui-render COMMAND ui-test)

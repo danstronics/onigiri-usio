@@ -29,6 +29,12 @@ int main(void) {
         ui_state_t off = d; off.dx = false; static uint8_t ref[UI_BYTES]; ui_render(&off, ref);
         assert(memcmp(fb, ref, UI_BYTES)); // The badge is visible.
     }
+    // Clean screens for the manual (tools/gen_manual.py).
+    for (unsigned p = 0; p < USIO_PROFILE_COUNT; p++) {
+        ui_state_t s = {.profile = (uint8_t)p, .uptime_s = 754, .dx = p == USIO_DEADSTORM};
+        ui_render(&s, fb); snprintf(name, sizeof(name), "manual-%02u.pbm", p); save(name, fb);
+    }
+    { ui_state_t m = {.menu = true, .selected = USIO_DEADSTORM}; ui_render(&m, fb); save("manual-menu.pbm", fb); }
     ui_state_t frozen = {.profile = USIO_DEADSTORM, .uptime_s = 640, .frozen = true, .blink_on = false};
     ui_render(&frozen, fb); save("frozen-off.pbm", fb);
     unsigned lit_off = 0, lit_on = 0;
@@ -37,9 +43,17 @@ int main(void) {
     frozen.blink_on = true; ui_render(&frozen, fb);
     for (int x = 0; x < UI_WIDTH; x++) lit_on += __builtin_popcount(fb[x] & 0xfe);
     assert(lit_on > lit_off + 20); // The frozen clock digits blink.
-    for (unsigned sel = 0; sel < USIO_PROFILE_COUNT; sel += 5) {
-        ui_state_t m = {.menu = true, .selected = (uint8_t)sel};
-        ui_render(&m, fb); snprintf(name, sizeof(name), "menu-%02u.pbm", sel); save(name, fb);
+    for (unsigned pos = 0; pos < USIO_PROFILE_COUNT; pos += 5) {
+        ui_state_t m = {.menu = true, .selected = (uint8_t)usio_menu_profile(pos)};
+        ui_render(&m, fb); snprintf(name, sizeof(name), "menu-%02u.pbm", pos); save(name, fb);
+    }
+    // Marquee: a long title scrolls; the frame changes with the step.
+    static uint8_t first_frame[UI_BYTES];
+    const unsigned steps[] = {0, 60, 110};
+    for (unsigned i = 0; i < 3; i++) {
+        ui_state_t m = {.menu = true, .selected = USIO_TAG2_UNLIMITED, .scroll = (uint16_t)steps[i]};
+        ui_render(&m, fb); snprintf(name, sizeof(name), "marquee-%u.pbm", i); save(name, fb);
+        if (!i) memcpy(first_frame, fb, UI_BYTES); else assert(memcmp(first_frame, fb, UI_BYTES));
     }
     puts("PASS UI render");
     return 0;

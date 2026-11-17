@@ -6,11 +6,14 @@ controller). It replaces the Namco **USIO** board: coin, test/service,
 player controls, gun aiming, card reader replies and 1 MiB of backup
 memory, with a status display.
 
-Supported profiles: Taiko no Tatsujin, Tekken 6, Tekken 6 Bloodline
-Rebellion, Tekken Tag Tournament 2 (vanilla / Unlimited), Gundam Extreme VS
-Maxi Boost, Dragon Ball Zenkai Battle, Deadstorm Pirates, Razing Storm, Dark
-Escape 4D, Sailor Zombie AKB48. Hardware status per game is in
+Supported games: Tekken 6, Tekken 6 Bloodline Rebellion, Tekken Tag
+Tournament 2 (vanilla / Unlimited), Dragon Ball Zenkai Battle, Gundam Extreme
+VS Maxi Boost, Razing Storm, Deadstorm Pirates, Dark Escape 4D, Sailor Zombie
+AKB48, Taiko no Tatsujin. Hardware status per game is in
 [docs/Games.md](docs/Games.md).
+
+**User manual:** [manual/README.md](manual/README.md) - connecting, Game
+Select and the button layout of every game.
 
 ## What we learned about the USIO
 
@@ -57,7 +60,8 @@ firmware/         RP2040 firmware (protocol, USB transport, flash, UI)
 libs/pico_ssd1306 SSD1306 driver (MIT) with bounded I2C writes
 tests/usio        host tests: protocol, TinyUSB transport, flash, UI render
 tests/ui          display preview renderer
-tools/            font generator, SDK race scanner
+manual/           user manual and controller diagrams
+tools/            font and manual generators, SDK race scanner
 docs/             USIO documentation
 ```
 

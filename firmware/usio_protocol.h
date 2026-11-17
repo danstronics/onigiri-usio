@@ -58,6 +58,9 @@ uint16_t usio_profile_version(usio_profile_t);
 usio_layout_t usio_profile_layout(usio_profile_t);
 // Offset of the first USIO node in the 0x1000 input block for this game.
 unsigned usio_profile_input_base(usio_profile_t);
+// Game Select display order (independent of the stored profile numbers).
+usio_profile_t usio_menu_profile(unsigned position);
+unsigned usio_menu_position(usio_profile_t);
 // Games with a mounted gun read P1 X/Y from analog channels 0/1 of that node.
 bool usio_profile_has_gun(usio_profile_t);
 void usio_protocol_init(usio_protocol_t *, usio_profile_t, usio_memory_t);

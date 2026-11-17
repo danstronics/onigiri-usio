@@ -16,7 +16,7 @@
 
 // The clock stops (and blinks) once the System has issued no USIO command
 // for this long: a crashed or hung game stops polling its I/O board.
-enum { USB_SILENCE_MS = 2000, BLINK_MS = 500, DEBOUNCE_MS = 8 };
+enum { USB_SILENCE_MS = 2000, BLINK_MS = 500, DEBOUNCE_MS = 8, MARQUEE_MS = 40 };
 
 static usio_protocol_t protocol;
 static queue_t display_queue;
@@ -105,6 +105,7 @@ int main(void) {
             view.menu = selector.menu; view.uptime_s = (frozen ? last_command_ms : now) / 1000;
             view.frozen = frozen; view.blink_on = frozen && (now / BLINK_MS) % 2 == 0;
             view.test = protocol.test_on; view.dx = protocol.dx_on;
+            if (selector.menu) view.scroll = (uint16_t)(now / MARQUEE_MS);   // One pixel per step.
             if (memcmp(&view, &shown, sizeof(view)) && queue_try_add(&display_queue, &view)) shown = view;
         }
         if (usio_usb_idle()) {

@@ -16,7 +16,9 @@ the GPIO to GND; internal pull-ups and an 8 ms debounce are used.
 
 Hold **+ and -** for 2 seconds for **Game Select**: Up/Down to choose,
 + to confirm, - to cancel. The game choice changes the USB identity; it is
-saved in flash.
+saved in flash. The list is ordered Tekken (by release), Dragon Ball,
+Gundam, the shooters, Taiko; titles too long for a row scroll in a loop.
+The illustrated user manual is in `manual/`.
 
 ## D-pad and action buttons - gameplay
 

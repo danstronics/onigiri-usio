@@ -7,8 +7,9 @@ bool usio_selector_update(usio_selector_t *s, bool plus, bool minus, bool up, bo
     if (s->wait_release) {
         if (!plus && !minus && !up && !down) s->wait_release = false;
     } else if (s->menu) {
-        if (up && !s->previous_up) s->selected = (usio_profile_t)((s->selected + USIO_PROFILE_COUNT - 1) % USIO_PROFILE_COUNT);
-        if (down && !s->previous_down) s->selected = (usio_profile_t)((s->selected + 1) % USIO_PROFILE_COUNT);
+        unsigned at = usio_menu_position(s->selected);
+        if (up && !s->previous_up) s->selected = usio_menu_profile(at + USIO_PROFILE_COUNT - 1);
+        if (down && !s->previous_down) s->selected = usio_menu_profile(at + 1);
         if (plus && !s->previous_plus) {
             changed = s->active != s->selected; s->active = s->selected; s->menu = false; s->wait_release = true;
         } else if (minus && !s->previous_minus) { s->selected = s->active; s->menu = false; s->wait_release = true; }
