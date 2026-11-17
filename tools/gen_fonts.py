@@ -1,0 +1,119 @@
+"""Generate firmware/ui_fonts.h (run from the repository root: python tools/gen_fonts.py).
+
+Title font: Aileron Regular (SIL Open Font License 1.1, bundled with Pillow),
+rendered once at 14 px without anti-aliasing and emboldened by one pixel.
+Clock font: the 5x7 bitmap font shipped with pico_ssd1306 (copied, renamed).
+Bar font: 3x5 pixel font drawn by hand for this project.
+"""
+from pathlib import Path
+import re
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / 'firmware' / 'ui_fonts.h'
+FIRST, LAST = 32, 126
+TRACKING = 0  # extra pixels between letters (the 1 px emboldening already separates them)
+
+def title_font(size=14):
+    font = ImageFont.load_default(size=size)
+    glyphs = []
+    for code in range(FIRST, LAST + 1):
+        ch = chr(code)
+        img = Image.new('1', (40, 40), 0)
+        d = ImageDraw.Draw(img); d.fontmode = '1'
+        for dx in (0, 1):
+            d.text((2 + dx, 0), ch, font=font, fill=1)
+        advance = int(round(font.getlength(ch))) + TRACKING
+        glyphs.append((img, advance))
+    rows = [y for img, _ in glyphs for y in range(40) for x in range(40) if img.getpixel((x, y))]
+    top, bottom = min(rows), max(rows)
+    height = bottom - top + 1
+    data, widths = [], []
+    for img, advance in glyphs:
+        cols = [x for y in range(top, bottom + 1) for x in range(40) if img.getpixel((x, y))]
+        left = 2
+        width = max(cols) - left + 1 if cols else 0
+        assert width <= 16, width
+        widths.append(max(advance, width) if cols else advance)
+        for y in range(top, bottom + 1):
+            bits = 0
+            for x in range(16):
+                if left + x < 40 and img.getpixel((left + x, y)):
+                    bits |= 0x8000 >> x
+            data.append(bits)
+    return height, widths, data
+
+def clock_font():
+    src = (ROOT / 'libs/pico_ssd1306/include/ssd1306/font.h').read_text()
+    body = src[src.index('{') + 1:src.index('};')]
+    values = [int(v, 16) if v.startswith('0x') else int(v) for v in re.findall(r'0x[0-9A-Fa-f]+|\d+', body)]
+    assert values[:5] == [8, 5, 1, 32, 126]
+    return values[5:]
+
+# 3x5 glyphs, rows top to bottom, '#' = pixel.
+TINY = {
+ ' ': ['...']*5,
+ '0': ['###','#.#','#.#','#.#','###'], '1': ['.#.','##.','.#.','.#.','###'],
+ '2': ['###','..#','###','#..','###'], '3': ['###','..#','.##','..#','###'],
+ '4': ['#.#','#.#','###','..#','..#'], '5': ['###','#..','###','..#','###'],
+ '6': ['###','#..','###','#.#','###'], '7': ['###','..#','.#.','.#.','.#.'],
+ '8': ['###','#.#','###','#.#','###'], '9': ['###','#.#','###','..#','###'],
+ 'A': ['.#.','#.#','###','#.#','#.#'], 'B': ['##.','#.#','##.','#.#','##.'],
+ 'C': ['.##','#..','#..','#..','.##'], 'D': ['##.','#.#','#.#','#.#','##.'],
+ 'E': ['###','#..','##.','#..','###'], 'F': ['###','#..','##.','#..','#..'],
+ 'G': ['.##','#..','#.#','#.#','.##'], 'H': ['#.#','#.#','###','#.#','#.#'],
+ 'I': ['###','.#.','.#.','.#.','###'], 'J': ['..#','..#','..#','#.#','.#.'],
+ 'K': ['#.#','#.#','##.','#.#','#.#'], 'L': ['#..','#..','#..','#..','###'],
+ 'M': ['#.#','###','###','#.#','#.#'], 'N': ['##.','#.#','#.#','#.#','#.#'],
+ 'O': ['.#.','#.#','#.#','#.#','.#.'], 'P': ['##.','#.#','##.','#..','#..'],
+ 'Q': ['.#.','#.#','#.#','##.','.##'], 'R': ['##.','#.#','##.','#.#','#.#'],
+ 'S': ['.##','#..','.#.','..#','##.'], 'T': ['###','.#.','.#.','.#.','.#.'],
+ 'U': ['#.#','#.#','#.#','#.#','###'], 'V': ['#.#','#.#','#.#','#.#','.#.'],
+ 'W': ['#.#','#.#','###','###','#.#'], 'X': ['#.#','#.#','.#.','#.#','#.#'],
+ 'Y': ['#.#','#.#','.#.','.#.','.#.'], 'Z': ['###','..#','.#.','#..','###'],
+ 'c': ['...','.##','#..','#..','.##'], 'i': ['.#.','...','.#.','.#.','.#.'],
+ 'o': ['...','.#.','#.#','#.#','.#.'], 'p': ['...','##.','#.#','##.','#..'],
+ 'v': ['...','#.#','#.#','#.#','.#.'],
+ 'g': ['...','.##','#.#','.##','##.'], 'n': ['...','##.','#.#','#.#','#.#'],
+ 'r': ['...','#.#','##.','#..','#..'], 's': ['...','.##','##.','..#','##.'],
+ 'u': ['...','#.#','#.#','#.#','.##'],
+ '.': ['...','...','...','...','.#.'], ':': ['...','.#.','...','.#.','...'],
+ '+': ['...','.#.','###','.#.','...'], '-': ['...','...','###','...','...'],
+ '/': ['..#','..#','.#.','#..','#..'],
+}
+
+def tiny_font():
+    cols = []
+    for code in range(FIRST, LAST + 1):
+        rows = TINY.get(chr(code)) or TINY.get(chr(code).upper()) or TINY[' ']
+        for x in range(3):
+            cols.append(sum(1 << y for y in range(5) if rows[y][x] == '#'))
+    return cols
+
+def table(name, ctype, values, per_line):
+    lines = [f'static const {ctype} {name}[] = {{']
+    for i in range(0, len(values), per_line):
+        lines.append('    ' + ', '.join(f'0x{v:04x}' if ctype == 'uint16_t' else f'0x{v:02x}' for v in values[i:i+per_line]) + ',')
+    lines.append('};')
+    return '\n'.join(lines)
+
+height, widths, data = title_font()
+text = f'''// SPDX-License-Identifier: GPL-2.0-only
+// Generated by tools/gen_fonts.py - do not edit.
+// Title glyphs rendered from Aileron Regular, Copyright Sora Sagano,
+// licensed under the SIL Open Font License 1.1 (see NOTICE.md).
+#ifndef ONIGIRI_UI_FONTS_H
+#define ONIGIRI_UI_FONTS_H
+#include <stdint.h>
+enum {{ UI_FONT_FIRST = {FIRST}, UI_FONT_LAST = {LAST}, UI_TITLE_HEIGHT = {height} }};
+// Title: per glyph {height} rows, MSB = leftmost pixel.
+{table('ui_title_rows', 'uint16_t', data, height)}
+static const uint8_t ui_title_advance[] = {{ {', '.join(map(str, widths))} }};
+// Clock: 5 columns per glyph, bit 0 = top row (pico_ssd1306 font_8x5).
+{table('ui_clock_cols', 'uint8_t', clock_font(), 5)}
+// Bar: 3 columns per glyph, bit 0 = top row, 5 rows.
+{table('ui_tiny_cols', 'uint8_t', tiny_font(), 3)}
+#endif
+'''
+OUT.write_text(text)
+print('title height', height, 'written', OUT)
