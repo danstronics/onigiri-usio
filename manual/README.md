@@ -14,11 +14,11 @@
 
 ## Display
 
-* **uptime**: time since power on. If the game stops talking to the I/O
-  board (crash or freeze), the clock stops and blinks.
+* **Top bar**: `onigiri-usio`, and **TEST** while test mode is on.
 * **Game title** in the middle. **DX** appears under Deadstorm Pirates when
   the DX cabinet mode is on.
-* **TEST** in the bottom bar while test mode is on.
+* **uptime** at the bottom: time since power on. If the game stops talking to
+  the I/O board (crash or freeze), the clock stops and blinks.
 
 ## System buttons (all games)
 

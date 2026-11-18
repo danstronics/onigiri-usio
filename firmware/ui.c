@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// OLED layout: clock line, game title in the large font, white bottom bar.
+// OLED layout: white top bar, Game Select hint, game title in the large font,
+// uptime clock at the bottom.
 #include "ui.h"
 #include "ui_fonts.h"
 #include "usio_protocol.h"
@@ -9,7 +10,7 @@
 #ifndef ONIGIRI_VERSION
 #define ONIGIRI_VERSION "dev"
 #endif
-enum { BAR_TOP = 55, CLOCK_TOP = 1, HINT_TOP = BAR_TOP - 7 };
+enum { BAR_H = 9, HINT_TOP = BAR_H + 2, TITLE_TOP = HINT_TOP + 6, CLOCK_TOP = UI_HEIGHT - 8 };
 #define HINT "HOLD + AND - FOR GAME SELECT"
 
 static void pixel(uint8_t *fb, int x, int y, bool on) {
@@ -108,13 +109,18 @@ static void format_clock(char *out, size_t size, uint32_t s) {
     if (s >= 3600) snprintf(out, size, "%lu:%02lu:%02lu", (unsigned long)(s / 3600), (unsigned long)(s / 60 % 60), (unsigned long)(s % 60));
     else snprintf(out, size, "%02lu:%02lu", (unsigned long)(s / 60), (unsigned long)(s % 60));
 }
-static void bar(uint8_t *fb, int top, const char *left, const char *right) {
-    fill(fb, 0, top, UI_WIDTH, UI_HEIGHT - top, true);
-    if (left) tiny(fb, 3, top + 2, left, false);
-    if (right) tiny(fb, UI_WIDTH - 3 - tiny_width(right), top + 2, right, false);
+static void bar(uint8_t *fb, const char *left, const char *right) {
+    fill(fb, 0, 0, UI_WIDTH, BAR_H, true);
+    if (left) tiny(fb, 3, 2, left, false);
+    if (right) tiny(fb, UI_WIDTH - 3 - tiny_width(right), 2, right, false);
 }
 
 static void main_screen(const ui_state_t *s, uint8_t *fb) {
+    bar(fb, s->test ? "TEST" : NULL, "onigiri-usio");
+    tiny(fb, (UI_WIDTH - tiny_width(HINT)) / 2, HINT_TOP, HINT, true);
+    int below = title_block(fb, usio_profile_name((usio_profile_t)s->profile), TITLE_TOP, CLOCK_TOP - 1,
+                            s->dx ? BADGE_GAP + BADGE_H : 0);
+    if (s->dx) badge(fb, below + BADGE_GAP, "DX");
     char clock[24]; format_clock(clock, sizeof(clock), s->uptime_s);
     const char *label = "uptime", *sep = " : ";
     int w = clock_width(label, true) + clock_width(sep, false) + clock_width(clock, false);
@@ -122,16 +128,10 @@ static void main_screen(const ui_state_t *s, uint8_t *fb) {
     x = clock_text(fb, x, CLOCK_TOP, label, true) + 1;
     x = clock_text(fb, x, CLOCK_TOP, sep, false);
     if (!s->frozen || s->blink_on) clock_text(fb, x, CLOCK_TOP, clock, false);
-    int below = title_block(fb, usio_profile_name((usio_profile_t)s->profile), CLOCK_TOP + 9, HINT_TOP - 1,
-                            s->dx ? BADGE_GAP + BADGE_H : 0);
-    if (s->dx) badge(fb, below + BADGE_GAP, "DX");
-    tiny(fb, (UI_WIDTH - tiny_width(HINT)) / 2, HINT_TOP, HINT, true);
-    bar(fb, BAR_TOP, s->test ? "TEST" : NULL, "onigiri-usio");
 }
 
 static void menu_screen(const ui_state_t *s, uint8_t *fb) {
-    bar(fb, 0, "GAME SELECT", "v" ONIGIRI_VERSION);
-    fill(fb, 0, 9, UI_WIDTH, UI_HEIGHT - 9, false);
+    bar(fb, "GAME SELECT", "v" ONIGIRI_VERSION);
     enum { ROWS = 5, ROW_H = 9, LIST_TOP = 10, TRACK_H = ROWS * ROW_H, SCROLL_X = UI_WIDTH - 3, LIST_W = UI_WIDTH - 5,
            TEXT_X = 3, TEXT_END = LIST_W - 3, GAP = 24, PAUSE = 25 };
     unsigned at = usio_menu_position((usio_profile_t)s->selected);

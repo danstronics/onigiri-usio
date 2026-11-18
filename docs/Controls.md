@@ -35,13 +35,13 @@ Taiko: West = left Ka, North = left Don, South = right Don, East = right Ka.
 
 ## Display (SSD1306 128x64, I2C0 SDA 8 / SCL 9)
 
-* **uptime** - time since power on. When the System stops issuing USB
-  commands for 2 seconds (crash, hang), the clock stops at the last command
-  and blinks. It resumes on its own if the commands come back.
+* White **bar** at the top with `onigiri-usio`, plus `TEST` while test mode
+  is on, and below it the **HOLD + AND - FOR GAME SELECT** hint.
 * **Game name** in the large font, wrapped when needed; a white **DX** badge
   appears under Deadstorm Pirates when the DX cabinet switch is on.
-* **HOLD + AND - FOR GAME SELECT** hint, then the white bar with
-  `onigiri-usio`, plus `TEST` while test mode is on.
+* **uptime** at the bottom - time since power on. When the System stops
+  issuing USB commands for 2 seconds (crash, hang), the clock stops at the
+  last command and blinks. It resumes on its own if the commands come back.
 * Game Select shows the list with a scroll bar on the right.
 
 `tests/ui/ui_preview.c` renders every screen to PBM images on a PC.

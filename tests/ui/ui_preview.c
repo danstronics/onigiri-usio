@@ -38,10 +38,10 @@ int main(void) {
     ui_state_t frozen = {.profile = USIO_DEADSTORM, .uptime_s = 640, .frozen = true, .blink_on = false};
     ui_render(&frozen, fb); save("frozen-off.pbm", fb);
     unsigned lit_off = 0, lit_on = 0;
-    for (int x = 0; x < UI_WIDTH; x++) lit_off += __builtin_popcount(fb[x] & 0xfe);
-    assert((fb[0 + UI_WIDTH * 7] & 0x80) && (fb[127 + UI_WIDTH * 7] & 0x80)); // White bar edge to edge.
+    for (int x = 0; x < UI_WIDTH; x++) lit_off += __builtin_popcount(fb[x + UI_WIDTH * 7]);
+    assert((fb[0] & 0x01) && (fb[127] & 0x01)); // White top bar edge to edge.
     frozen.blink_on = true; ui_render(&frozen, fb);
-    for (int x = 0; x < UI_WIDTH; x++) lit_on += __builtin_popcount(fb[x] & 0xfe);
+    for (int x = 0; x < UI_WIDTH; x++) lit_on += __builtin_popcount(fb[x + UI_WIDTH * 7]);
     assert(lit_on > lit_off + 20); // The frozen clock digits blink.
     for (unsigned pos = 0; pos < USIO_PROFILE_COUNT; pos += 5) {
         ui_state_t m = {.menu = true, .selected = (uint8_t)usio_menu_profile(pos)};
