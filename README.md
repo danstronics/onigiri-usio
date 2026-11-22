@@ -10,7 +10,7 @@ Download the firmware `.uf2` file from [Releases](https://github.com/danstronics
 
 ## User manuals
 
-[English (PDF)](manual/Onigiri-USIO-EN.pdf) ? [Italiano (PDF)](manual/Onigiri-USIO-IT.pdf)
+[English (PDF)](manual/Onigiri-USIO-EN.pdf) | [Italiano (PDF)](manual/Onigiri-USIO-IT.pdf)
 
 ## Supported games
 
