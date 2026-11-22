@@ -29,7 +29,7 @@ int main(void) {
         ui_state_t off = d; off.dx = false; static uint8_t ref[UI_BYTES]; ui_render(&off, ref);
         assert(memcmp(fb, ref, UI_BYTES)); // The badge is visible.
     }
-    // Clean screens for the manual (tools/gen_manual.py).
+    // Render the game and selection screens.
     for (unsigned p = 0; p < USIO_PROFILE_COUNT; p++) {
         ui_state_t s = {.profile = (uint8_t)p, .uptime_s = 754, .dx = p == USIO_DEADSTORM};
         ui_render(&s, fb); snprintf(name, sizeof(name), "manual-%02u.pbm", p); save(name, fb);

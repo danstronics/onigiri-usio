@@ -11,21 +11,7 @@ was not measured.
 
 ## Which games
 
-Every title we examined except Taiko links the same Namco USIO driver, and every
-one of them has the bug. The driver was found with a structural scan (semaphore post, then reload of
-`ctx+0x24`, then indirect call) of the original executables:
-
-| Game | Executable | Race sites (post call) |
-|---|---|---|
-| Deadstorm Pirates SE | `EBOOT.BIN` | `0x5D53C0`, `0x5D5530` |
-| Tekken 6 | `GAME_109.SELF` | `0x5FD1FC`, `0x5FD3D4` |
-| Tekken 6 Bloodline Rebellion | `GAME_208.SELF` | `0x4BE298`, `0x4BE408` |
-| Tekken Tag Tournament 2 | `GAME0180.SELF` | `0x4B5664` and 9 more (-O0 build) |
-| Gundam Extreme VS Maxi Boost | `GAME.SELF` 24.07 | `0x503098` and 9 more |
-| Dragon Ball Zenkai Battle | `game.self` 26.01 | `0xC33CA0` and 9 more |
-| Razing Storm | `EBOOT.BIN` | `0x507728`, `0x507898` |
-| Dark Escape 4D | `EBOOT.BIN` | `0x5608CC` and 9 more (SNC build, `bdnzctrl`) |
-| Sailor Zombie | `EBOOT.BIN` | `0x4C305C` and 9 more |
+The examined titles other than Taiko use the same Namco USIO driver.
 
 All of them share the same command chain:
 
@@ -68,7 +54,7 @@ The semaphore is created with a maximum count of 1, so an extra post is
 rejected by the kernel and does no harm. The harm comes only from the
 unmatched IN transfers.
 
-## Device-side recovery (no game patch)
+## Device-side recovery
 
 The signature is unambiguous. In a healthy flow the next request is only
 issued from the previous READ's completion, so a header never arrives

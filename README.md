@@ -1,8 +1,6 @@
-# Onigiri USIO
+![Onigiri USIO - USIO emulator for RP2040](docs/Onigiri-USIO-banner.svg)
 
-USB I/O board emulator for Bandai Namco **System 357/369** arcade games,
-running on an RP2040 (Raspberry Pi Pico, Waveshare RP2040-Zero, Onigiri
-controller). It replaces the Namco **USIO** board: coin, test/service,
+Firmware for the Onigiri controller (RP2040) that emulates the Namco USB I/O board for **System 357/369** arcade games. It replaces the Namco **USIO** board: coin, test/service,
 player controls, gun aiming, card reader replies and 1 MiB of backup
 memory, with a status display.
 
@@ -12,8 +10,9 @@ VS Maxi Boost, Razing Storm, Deadstorm Pirates, Dark Escape 4D, Sailor Zombie
 AKB48, Taiko no Tatsujin. Hardware status per game is in
 [docs/Games.md](docs/Games.md).
 
-**User manual:** [manual/README.md](manual/README.md) - connecting, Game
-Select, the button layout of every game and how to update.
+**User manuals**
+
+[Italiano (PDF)](manual/Onigiri-USIO-IT.pdf) ? [English (PDF)](manual/Onigiri-USIO-EN.pdf)
 
 **Download:** the ready-to-flash `.uf2` is on the
 [Releases](https://github.com/danstronics/onigiri-usio/releases) page.
@@ -24,14 +23,12 @@ Select, the button layout of every game and how to update.
   format, registers, input/status layout, backup memory.
 * [docs/SDK-callback-race.md](docs/SDK-callback-race.md) - why emulated
   boards end in **NOT CONNECT IO-PCB** on every Namco SDK game, and how the
-  device recovers without patching the game.
+  firmware recovers the USB connection.
 * [docs/Games.md](docs/Games.md) - per-game identity, node, switch bits,
   transport.
 * [docs/Emulation-guide.md](docs/Emulation-guide.md) - checklist for
   writing your own emulator.
 * [docs/Controls.md](docs/Controls.md) - button mapping and display.
-* `tools/usio_sdk_scan.py` - finds the race and the SDK command chain in
-  other game executables (decrypted ELF or debug SELF).
 
 ## Building
 
@@ -63,8 +60,8 @@ firmware/         RP2040 firmware (protocol, USB transport, flash, UI)
 libs/pico_ssd1306 SSD1306 driver (MIT) with bounded I2C writes
 tests/usio        host tests: protocol, TinyUSB transport, flash, UI render
 tests/ui          display preview renderer
-manual/           user manual and controller diagrams
-tools/            font and manual generators, SDK race scanner
+manual/           Italian and English PDF manuals
+tools/            OLED font generator
 docs/             USIO documentation
 ```
 
